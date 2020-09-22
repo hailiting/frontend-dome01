@@ -1,0 +1,33 @@
+{
+  "name": "week06",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test:dev": "node index.js --mode=develop",
+    "test": "",
+    "start": "pm2 start",
+    "build": "",
+    "server:dev": "gulp",
+    "server:prod": "cross-env NODE_ENV=production gulp",
+    "server:lint": "cross-env NODE_ENV=lint gulp",
+    "client:dev": "webpack --mode=devlopment",
+    "client:prod": "webpack --mode=production",
+    "docs": "jsdoc ./src/nodeuii/**/*.js -d ./docs/jsdocs",
+    "start:dev": "cross-env NODE_ENV=develop supervisor ./dist/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "path": "^0.12.7",
+    "webpack": "^4.44.2",
+    "glob": "^7.1.6",
+    "koa2": "^2.0.0-alpha.7",
+    "webpack-merge": "^5.1.4"
+  },
+  "dependencies": {}
+}

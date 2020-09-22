@@ -1,0 +1,5 @@
+.components-ydheader {
+  & div {
+    color: #fff;
+  }
+}

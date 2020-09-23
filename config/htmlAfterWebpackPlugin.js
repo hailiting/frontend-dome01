@@ -1,19 +1,23 @@
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { compilation } = require("webpack");
 
 const pluginName = "htmlAfterWebpackPlugin";
-const assetsHelp = (data) => {
+const assetsHelp = (val) => {
+  const data = JSON.parse(val);
   let css = [],
     js = [];
   const dir = {
     js: (item) => `<script src="${item}"></script>`,
     css: (item) => `<link rel="stylesheet" href="${item}" />`,
   };
-  for (let jsitem of data.js) {
-    js.push(dir.js(jsitem));
+  for (let key of data) {
+    if (key.indexOf(".js") > -1) {
+      js.push(dir.js(key));
+    } else if (key.indexOf(".css") > -1) {
+      css.push(dir.css(key));
+    }
   }
-  for (let cssitem of data.css) {
-    css.push(dir.css(cssitem));
-  }
+  console.log(css, js);
   return {
     css,
     js,
@@ -22,14 +26,19 @@ const assetsHelp = (data) => {
 class HtmlAfterWebpackPlugin {
   apply(compiler) {
     compiler.hooks.compilation.tap(pluginName, (compilation) => {
-      compilation.hooks.htmlWebpackPluginAfterHtmlProcessing.tap(
-        pluginName,
-        (htmlPluginData) => {
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
+        "MyPlugin",
+        (htmlPluginData, cb) => {
           let _html = htmlPluginData.html;
-          const result = assetsHelp(htmlPluginData.assets);
-          _html = _html.require("<!-- injectcss -->", result.css.join(""));
-          _html = _html.require("<!-- injectjs -->", result.js.join(""));
+          _html = _html.replace(/components:/g, "../../../components/");
+          _html = _html.replace(/common:/g, "../../common/");
+          console.log("32:--------", htmlPluginData.plugin.assetJson);
+          const result = assetsHelp(htmlPluginData.plugin.assetJson);
+          console.log("33:  ---", { result }, result.css);
+          _html = _html.replace("<!-- injectcss -->", result.css.join(""));
+          _html = _html.replace("<!-- injectjs -->", result.js.join(""));
           htmlPluginData.html = _html;
+          cb(null, htmlPluginData);
         }
       );
     });

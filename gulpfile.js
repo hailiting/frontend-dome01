@@ -1,37 +1,32 @@
-const gulp = require("gulp"),
-  watch = require("gulp-watch");
-const babel = require("glob-babel");
+const gulp = require("gulp");
+const babel = require("gulp-babel");
 const rollup = require("gulp-rollup");
 const replace = require("rollup-plugin-replace");
 const gulpSequence = require("gulp-sequence");
 const eslint = require("gulp-eslint");
 const logLine = require("gulp-log-line");
-gulp.task("builddev", () => {
-  return watch(
-    "./src/nodeuii/**/*.js",
-    {
-      ignoreInitial: false,
-    },
-    () => {
-      gulp
-        .src("./src/nodeuii/**/*.js")
-        .pipe(
-          babel({
-            // 关闭外侧的 .babelrc
-            babelrc: false,
-            plugins: [
-              "babel-plugin-transfron-es2105-modules-commonjs",
-              "transfrom-decorators-legacy",
-            ],
-          })
-        )
-        .pipe(logLine(["console.log", "winston.info"]))
-        .pipe(gulp.dest("dist"));
-    }
+const del = require("del");
+function builddev() {
+  return (
+    gulp
+      .src("./src/nodeuii/**/*.js")
+      .pipe(
+        babel({
+          // 关闭外侧的 .babelrc
+          babelrc: false,
+          plugins: [
+            ["@babel/plugin-proposal-decorators", { legacy: true }],
+            ["@babel/plugin-proposal-class-properties", { loose: true }],
+            "transform-es2015-modules-commonjs",
+          ],
+        })
+      )
+      // .pipe(logLine(["console.log", "winston.info"]))
+      .pipe(gulp.dest("dist"))
   );
-});
-gulp.task("buildprod", () => {
-  gulp
+}
+function buildprod() {
+  return gulp
     .src("./src/nodeuii/**/*.js")
     .pipe(
       babel({
@@ -39,16 +34,17 @@ gulp.task("buildprod", () => {
         babelrc: false,
         ignore: ["./src/nodeuii/config/*.js"],
         plugins: [
-          "babel-plugin-transfron-es2105-modules-commonjs",
-          "transfrom-decorators-legacy",
+          ["@babel/plugin-proposal-decorators", { legacy: true }],
+          ["@babel/plugin-proposal-class-properties", { loose: true }],
+          "transform-es2015-modules-commonjs",
         ],
       })
     )
     .pipe(gulp.dest("dist"));
-});
+}
 
-gulp.task("configclean", function () {
-  gulp
+function configclean() {
+  return gulp
     .src("./src/nodeuii/**/*.js")
     .pipe(
       rollup({
@@ -64,23 +60,34 @@ gulp.task("configclean", function () {
       })
     )
     .pipe(gulp.dest("./dist"));
-});
-gulp.task("lint", function () {
-  gulp
+}
+function lint() {
+  return gulp
     .src("./src/nodeuii/**/*.js")
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
-});
-
-let _task = ["builddev"];
+}
+function clean() {
+  del[
+    ("dist/config",
+    "dist/controllers",
+    "dist/middlewares",
+    "dist/models",
+    "dist/service",
+    "dist/views",
+    "dist/app.js")
+  ];
+}
+function watch() {
+  gulp.watch("./src/nodeuii/**/*.js", builddev);
+}
+let build = gulp.series(gulp.parallel(builddev));
 if (process.env.NODE_ENV === "production") {
-  console.log("production");
-  _task = gulpSequence("buildprod", "configclean");
+  build = gulp.series(buildprod, configclean);
 }
 if (process.env.NODE_ENV === "lint") {
-  console.log("lint");
-  _task = gulpSequence("buildprod", "lint");
+  build = gulp.series(buildprod, lint);
 }
-// console.error(_task)
-gulp.task("default", _task);
+exports.watch = watch;
+exports.default = build;

@@ -7,14 +7,6 @@ module.exports = [
   new HappyWebpack({
     id: "happyTS",
     threadPool: happyThreadPoll,
-    verbode: true,
-    loaders: [
-      {
-        path: "ts-loader",
-        query: {
-          happyPackMode: true,
-        },
-      },
-    ],
+    loaders: ["ts-loader"],
   }),
 ];

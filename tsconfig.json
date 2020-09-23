@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/webapp/*"]
+    },
+    "rootDirs": ["/src/webapp"],
+    "outDir": "dist",
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
+    "sourceMap": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "strict": false
+  },
+  "include": ["./src/webapp"],
+  "exclude": ["node_modules", "./src/nodeuii"]
+}
